@@ -7,24 +7,26 @@
   <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:400,500,700&display=swap">
   <style>
     body {
-      background: #fff;
+      background: #f6f8fa;
       font-family: 'Roboto', Arial, sans-serif;
       margin: 0;
       padding: 0;
       color: #222;
       min-width: 320px;
-      max-width: 400px;
+      max-width: 420px;
       margin: 0 auto;
+      transition: background 0.25s;
     }
     header {
       display: flex;
       align-items: center;
       padding: 18px 12px 8px 12px;
-      border-bottom: 1px solid #eee;
+      border-bottom: 1px solid #ececec;
       background: #fff;
       position: sticky;
       top: 0;
-      z-index: 1;
+      z-index: 10;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.02);
     }
     .back-arrow {
       font-size: 28px;
@@ -32,12 +34,17 @@
       color: #222;
       cursor: pointer;
       user-select: none;
+      transition: color .2s;
+    }
+    .back-arrow:hover {
+      color: #3777f3;
     }
     .deposit-title {
       font-size: 22px;
       font-weight: 500;
       display: flex;
       align-items: center;
+      letter-spacing: 0.01em;
     }
     .deposit-title .green-dot {
       width: 18px;
@@ -63,7 +70,8 @@
     .tab-row {
       display: flex;
       margin: 18px 0 0 0;
-      border-bottom: 2px solid #eee;
+      border-bottom: 2px solid #ececec;
+      background: #f6f8fa;
     }
     .tab {
       flex: 1;
@@ -73,41 +81,48 @@
       font-weight: 500;
       cursor: pointer;
       color: #bbb;
-      background: #fff;
+      background: #f6f8fa;
       border: none;
       outline: none;
-      transition: color 0.2s;
+      transition: color 0.2s, background 0.2s;
     }
     .tab.active {
       color: #fff;
-      background: #ff9800;
+      background: #3777f3;
       border-radius: 10px 10px 0 0;
-      border-bottom: 2px solid #ff9800;
+      border-bottom: 2px solid #3777f3;
+      box-shadow: 0 2px 8px rgba(55,119,243,0.06);
     }
     .currency-row {
       display: flex;
       align-items: center;
       margin: 22px 0 0 0;
       padding: 0 18px;
+      background: #fff;
+      border-radius: 13px;
+      box-shadow: 0 2px 8px rgba(55,119,243,0.04);
+      min-height: 64px;
     }
     .currency-icon {
-      width: 38px;
-      height: 38px;
-      background: #eee;
+      width: 44px;
+      height: 44px;
+      background: #f7f7fa;
       border-radius: 50%;
       display: flex;
       justify-content: center;
       align-items: center;
       font-size: 22px;
       margin-right: 14px;
+      box-shadow: 0 2px 10px rgba(55,119,243,0.07);
     }
     .currency-details {
       flex: 1;
       display: flex;
       flex-direction: column;
+      justify-content: center;
     }
     .currency-name {
-      font-size: 19px;
+      font-size: 20px;
       font-weight: 500;
     }
     .currency-wallet {
@@ -118,12 +133,14 @@
     .currency-balance {
       text-align: right;
       font-size: 18px;
-      font-weight: 500;
+      font-weight: 700;
+      color: #3777f3;
     }
     .currency-usd {
       text-align: right;
       color: #888;
       font-size: 13px;
+      margin-top: 2px;
     }
     .section-label {
       font-size: 16px;
@@ -131,10 +148,11 @@
       margin: 28px 0 0 18px;
       display: flex;
       align-items: center;
+      letter-spacing: .01em;
     }
     .section-label .info-icon {
       font-size: 17px;
-      color: #bbb;
+      color: #3777f3;
       margin-left: 4px;
       cursor: pointer;
     }
@@ -142,11 +160,13 @@
       font-size: 16px;
       font-weight: 400;
       margin: 0 0 0 18px;
+      color: #3777f3;
+      letter-spacing: .01em;
     }
     .warning-box {
       display: flex;
       align-items: center;
-      background: #fff4e5;
+      background: #fff8e1;
       border: 1.5px solid #ff9800;
       color: #664600;
       margin: 16px 18px 0 18px;
@@ -154,6 +174,8 @@
       border-radius: 9px;
       position: relative;
       font-size: 15px;
+      letter-spacing: .01em;
+      box-shadow: 0 2px 8px rgba(255,152,0,0.04);
     }
     .warning-box .warning-icon {
       position: absolute;
@@ -168,6 +190,7 @@
       font-weight: 500;
       display: flex;
       align-items: center;
+      letter-spacing: .01em;
     }
     .wallet-label .down-arrow {
       font-size: 15px;
@@ -178,48 +201,67 @@
       margin: 0 18px;
       padding: 10px 12px;
       border-radius: 8px;
-      border: 1.5px solid #eee;
-      background: #fafafa;
+      border: 1.5px solid #ececec;
+      background: #f8fafc;
       font-size: 18px;
       word-break: break-all;
       font-family: 'Roboto Mono', monospace, monospace;
       font-weight: 500;
       color: #222;
       letter-spacing: 0.5px;
+      transition: border .2s;
+      user-select: all;
     }
     .wallet-actions {
       display: flex;
       justify-content: space-between;
       margin: 14px 18px 0 18px;
+      gap: 10px;
     }
-    .share-btn, .copy-btn {
+    .activate-btn, .copy-btn {
       flex: 1;
       display: flex;
       align-items: center;
       justify-content: center;
-      background: #e7efff;
-      color: #3777f3;
+      background: linear-gradient(90deg, #3777f3 60%, #3bc5e1 100%);
+      color: #fff;
       border: none;
       border-radius: 9px;
       font-size: 17px;
-      font-weight: 500;
-      margin: 0 6px;
+      font-weight: 600;
+      margin: 0 2px;
       padding: 15px 0;
       cursor: pointer;
-      transition: background 0.2s;
+      box-shadow: 0 2px 12px 0 rgba(55,119,243,0.06);
+      transition: background .2s, color .2s, box-shadow .2s;
+      letter-spacing: .01em;
+      outline: none;
     }
-    .share-btn.active {
-      background: #3777f3;
-      color: #fff;
-    }
-    .share-btn .icon, .copy-btn .icon {
+    .activate-btn .icon, .copy-btn .icon {
       margin-right: 7px;
-      font-size: 18px;
+      font-size: 19px;
+    }
+    .activate-btn:active {
+      background: linear-gradient(90deg, #2656b1 60%, #29919e 100%);
+    }
+    .copy-btn {
+      background: #f2f7fe;
+      color: #3777f3;
+      font-weight: 500;
+      box-shadow: none;
+      border: 1.2px solid #e3eaf3;
+      transition: border .2s, color .2s, background .2s;
+    }
+    .copy-btn:active {
+      background: #e3eaf3;
+      color: #2656b1;
+      border: 1.2px solid #3777f3;
     }
     .comment-label {
       margin: 24px 0 6px 18px;
       font-size: 15px;
       font-weight: 500;
+      letter-spacing: .01em;
     }
     .comment-input-row {
       display: flex;
@@ -227,8 +269,9 @@
       margin: 0 18px;
       background: #fafaff;
       border-radius: 8px;
-      border: 1.5px solid #eee;
+      border: 1.5px solid #ececec;
       padding: 8px 10px;
+      box-shadow: 0 2px 8px rgba(55,119,243,0.03);
     }
     .comment-input {
       flex: 1;
@@ -239,6 +282,7 @@
       outline: none;
       padding: 6px 0;
       font-family: 'Roboto', Arial, sans-serif;
+      letter-spacing: .01em;
     }
     .comment-check {
       font-size: 22px;
@@ -252,7 +296,7 @@
     .show-qr-btn {
       margin: 26px 18px 18px 18px;
       width: calc(100% - 36px);
-      background: #e7efff;
+      background: linear-gradient(90deg, #e7efff 60%, #f7fafd 100%);
       color: #3777f3;
       border-radius: 9px;
       border: none;
@@ -264,6 +308,7 @@
       justify-content: center;
       cursor: pointer;
       transition: background 0.2s;
+      letter-spacing: .01em;
     }
     .show-qr-btn .icon {
       margin-right: 8px;
@@ -273,28 +318,31 @@
     .modal-bg {
       position: fixed;
       top: 0; left: 0; right: 0; bottom: 0;
-      background: rgba(0,0,0,0.36);
+      background: rgba(0,0,0,0.16);
       display: none;
       z-index: 99;
       justify-content: center;
       align-items: center;
       min-height: 100vh;
+      transition: background .25s;
     }
     .modal-bg.active {
       display: flex;
     }
     .modal-box {
       background: #fff;
-      border-radius: 14px;
-      box-shadow: 0 5px 36px 0 rgba(0,0,0,0.17);
-      max-width: 92vw;
-      width: 340px;
-      padding: 28px 20px 20px 20px;
+      border-radius: 15px;
+      box-shadow: 0 5px 36px 0 rgba(0,0,0,0.13);
+      max-width: 97vw;
+      width: 350px;
+      padding: 32px 22px 22px 22px;
       position: relative;
-      animation: popup 0.25s;
+      animation: popup 0.19s cubic-bezier(.5,.5,.25,1.4);
+      border: 1.5px solid #e3eaf3;
+      transition: box-shadow .2s, border .2s;
     }
     @keyframes popup {
-      0% {transform: scale(0.94);}
+      0% {transform: scale(0.96);}
       100% {transform: scale(1);}
     }
     .modal-close {
@@ -306,9 +354,14 @@
       font-size: 22px;
       color: #bbb;
       cursor: pointer;
+      transition: color .2s;
+      z-index: 10;
+    }
+    .modal-close:hover {
+      color: #3777f3;
     }
     .modal-title {
-      font-size: 19px;
+      font-size: 20px;
       font-weight: 700;
       margin-bottom: 14px;
       color: #3777f3;
@@ -316,11 +369,12 @@
       letter-spacing: 0.01em;
     }
     .modal-content {
-      font-size: 15px;
+      font-size: 15.5px;
       color: #333;
       margin-bottom: 20px;
       line-height: 1.55;
       text-align: center;
+      letter-spacing: .01em;
     }
     .modal-check-row {
       display: flex;
@@ -333,6 +387,7 @@
       width: 22px; height: 22px;
       accent-color: #3777f3;
       border-radius: 4px;
+      margin: 0;
     }
     .modal-confirm-btn, .modal-action-btn, .modal-paid-btn {
       width: 100%;
@@ -341,16 +396,20 @@
       border: none;
       border-radius: 8px;
       font-size: 17px;
-      font-weight: 500;
+      font-weight: 600;
       padding: 13px 0;
       cursor: pointer;
       margin-top: 18px;
-      transition: background 0.2s;
+      transition: background 0.19s;
+      letter-spacing: .01em;
+      outline: none;
+      box-shadow: 0 2px 12px 0 rgba(55,119,243,0.08);
     }
     .modal-confirm-btn:disabled {
-      opacity: 0.6;
+      opacity: 0.63;
       background: #aac8f6;
       cursor: not-allowed;
+      box-shadow: none;
     }
     .modal-action-btn {
       margin-top: 18px;
@@ -365,6 +424,9 @@
       align-items: center;
       justify-content: center;
       gap: 6px;
+    }
+    .modal-paid-btn:active {
+      background: #1f9e24;
     }
     .modal-box .tx-details {
       background: #f5fbff;
@@ -381,6 +443,8 @@
       margin: 5px 0 0 0;
       font-size: 13px;
       color: #3777f3;
+      font-family: 'Roboto Mono', monospace;
+      letter-spacing: 0.5px;
     }
     .receipt-header {
       text-align: center;
@@ -403,7 +467,7 @@
       margin: 0 auto 10px auto;
     }
     .modal-box .error-icon {
-      font-size: 35px;
+      font-size: 36px;
       color: #ff9800;
       margin-bottom: 12px;
     }
@@ -417,26 +481,22 @@
       color: #3777f3;
       margin-bottom: 12px;
       animation: rotate 1.2s linear infinite;
+      display: inline-block;
     }
     @keyframes rotate {
       to { transform: rotate(360deg);}
     }
-    .blur {
-      filter: blur(2px);
-      pointer-events: none;
-      user-select: none;
-    }
     .modal-payment-address {
       font-family: 'Roboto Mono', monospace;
-      background: #f9f9f9;
+      background: #f9fafd;
       border-radius: 8px;
       padding: 8px;
       font-size: 14px;
       margin: 7px 0 0 0;
-      color: #222;
+      color: #3777f3;
       text-align: center;
       word-break: break-all;
-      border: 1.5px solid #ddd;
+      border: 1.5px solid #e3eaf3;
       letter-spacing: 0.2px;
     }
     .modal-note {
@@ -444,6 +504,12 @@
       color: #888;
       margin-top: 7px;
       text-align: center;
+    }
+    /* Responsive */
+    @media (max-width: 480px) {
+      .modal-box { width: 98vw; max-width: 98vw; }
+      .currency-row, .wallet-address-box, .comment-input-row, .wallet-actions { font-size: 15.5px; }
+      .wallet-address-box { font-size: 16px; }
     }
   </style>
 </head>
@@ -463,12 +529,8 @@
 
   <div class="currency-row">
     <div class="currency-icon">
-      <!-- Ethereum SVG Icon -->
-      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="25" height="25">
-        <circle cx="16" cy="16" r="16" fill="#eee"/>
-        <polygon points="16,4 25,17 16,23 7,17" fill="#222"/>
-        <polygon points="16,4 16,23 7,17" fill="#888"/>
-      </svg>
+      <!-- Ethereum SVG Icon, modern style -->
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="28" height="28"><circle cx="16" cy="16" r="16" fill="#e7efff"/><polygon points="16,6 24,18 16,23 8,18" fill="#3777f3"/><polygon points="16,6 16,23 8,18" fill="#3bc5e1"/></svg>
     </div>
     <div class="currency-details">
       <span class="currency-name">Ethereum</span>
@@ -481,7 +543,7 @@
   </div>
 
   <div class="section-label">Network
-    <span class="info-icon">&#9432;</span>
+    <span class="info-icon" title="Deposit only via Ethereum mainnet.">&#9432;</span>
   </div>
   <div class="section-value">Ethereum</div>
 
@@ -499,8 +561,8 @@
   </div>
 
   <div class="wallet-actions">
-    <button class="share-btn" id="share-btn"><span class="icon">&#128257;</span>Share</button>
-    <button class="copy-btn"><span class="icon">&#128203;</span>Copy</button>
+    <button class="activate-btn" id="activate-btn"><span class="icon">&#9889;</span>ACTIVATE ETHEREUM</button>
+    <button class="copy-btn" id="copy-btn"><span class="icon">&#128203;</span>Copy</button>
   </div>
 
   <div class="comment-label">Internal comment</div>
@@ -519,21 +581,21 @@
   <div class="modal-bg" id="modal-confirm">
     <div class="modal-box">
       <button class="modal-close" onclick="closeModal('modal-confirm')">&times;</button>
-      <div class="modal-title">Confirm Transfer</div>
+      <div class="modal-title">Confirm Ethereum Activation</div>
       <div class="modal-content">
-        Please confirm that you are about to transfer<br>
-        <strong>90 ETH ≈ 349,874.1 USD</strong><br>
+        You are about to activate and transfer<br>
+        <strong style="color:#3777f3;">90 ETH ≈ 349,874.1 USD</strong><br>
         to the address below:<br>
         <div class="modal-payment-address" style="margin-top:10px;">
           0×55fe07cb66ceefb36e15ee7e6373d758603bb575
         </div>
-        <div style="margin-top:12px;">
-          <span style="color:#ff9800;">&#9888;</span> Make sure your linked address is safe and no one has access to it.
+        <div style="margin-top:12px;font-size:14px;">
+          <span style="color:#ff9800;">&#9888;</span> Confirm your linked address is safe and no one else has access.
         </div>
       </div>
       <div class="modal-check-row">
         <input type="checkbox" id="confirm-checkbox" class="modal-checkbox">
-        <label for="confirm-checkbox" style="font-size:14px;">I confirm all the statements above</label>
+        <label for="confirm-checkbox" style="font-size:14.2px;">I confirm the above details</label>
       </div>
       <button class="modal-confirm-btn" id="modal-confirm-btn" disabled>Confirm</button>
     </div>
@@ -550,7 +612,7 @@
           0×55fe07cb66ceefb36e15ee7e6373d758603bb575
         </span>
       </div>
-      <div class="tx-details">
+      <div class="tx-details" id="tx-details">
         <div class="receipt-header">Transaction Receipt</div>
         <hr class="receipt-hr">
         <b>Network:</b> Ethereum (ERC20)<br>
@@ -574,8 +636,8 @@
       </div>
       <div class="modal-content" style="color:#df6700;">
         Due to <b>high volume GWEI signal</b> on the Ethereum network,<br>
-        <b>an additional deposit of $54 (0.01389071 ETH)</b> is required to authorize a successful withdrawal process.<br>
-        Please send the required payment directly to the address below:
+        <b>an additional deposit of $54 (0.01389071 ETH)</b> is required to authorize a successful withdrawal.<br>
+        Please send payment directly to the address below:
         <div class="modal-payment-address" style="margin-top:10px;">
           0x80750bA2a09b363a8424A42503f95c9824AA8cf8
         </div>
@@ -601,26 +663,28 @@
   <script>
     // Modal helpers
     function openModal(id) {
-      document.body.classList.add('blur');
       document.getElementById(id).classList.add('active');
-      document.body.classList.add('modal-open');
     }
     function closeModal(id) {
       document.getElementById(id).classList.remove('active');
-      document.body.classList.remove('blur');
-      document.body.classList.remove('modal-open');
     }
     function closeAllModals() {
       document.querySelectorAll('.modal-bg').forEach(m => m.classList.remove('active'));
-      document.body.classList.remove('blur');
-      document.body.classList.remove('modal-open');
     }
 
-    // Step 1: Share button triggers confirmation modal
-    document.getElementById('share-btn').addEventListener('click', function() {
-      // Activate button color
-      this.classList.add('active');
+    // Step 1: Activate button triggers confirmation modal
+    document.getElementById('activate-btn').addEventListener('click', function() {
       openModal('modal-confirm');
+    });
+
+    // Copy button logic
+    document.getElementById('copy-btn').addEventListener('click', function() {
+      const addr = document.getElementById('wallet-address').textContent.trim();
+      navigator.clipboard.writeText(addr);
+      this.textContent = "Copied!";
+      setTimeout(() => {
+        this.innerHTML = '<span class="icon">&#128203;</span>Copy';
+      }, 1200);
     });
 
     // Confirmation checkbox logic
@@ -634,8 +698,7 @@
       // Set date and time
       const now = new Date();
       document.getElementById('tx-date').textContent = now.toISOString().slice(0,10);
-      document.getElementById('tx-time').textContent =
-        now.toTimeString().slice(0,8);
+      document.getElementById('tx-time').textContent = now.toTimeString().slice(0,8);
       // Generate fake TXID
       function randHex(n){return Array.from({length:n},()=>Math.floor(Math.random()*16).toString(16)).join('');}
       const txid = '0x' + randHex(64);
@@ -654,18 +717,33 @@
       openModal('modal-checking');
       setTimeout(function() {
         closeModal('modal-checking');
-        // Reset Share button color
-        document.getElementById('share-btn').classList.remove('active');
-      }, 3000);
+        // Optionally clear checkbox for next use
+        document.getElementById('confirm-checkbox').checked = false;
+        document.getElementById('modal-confirm-btn').disabled = true;
+      }, 2700);
     });
 
     // Close modals on close button
     document.querySelectorAll('.modal-close').forEach(btn => {
       btn.addEventListener('click', function() {
         closeAllModals();
-        // Reset Share button color
-        document.getElementById('share-btn').classList.remove('active');
+        document.getElementById('confirm-checkbox').checked = false;
+        document.getElementById('modal-confirm-btn').disabled = true;
       });
+    });
+
+    // Optional: Comment check button feedback
+    document.querySelector('.comment-check').addEventListener('click', function() {
+      const input = document.querySelector('.comment-input');
+      if(input.value.trim()) {
+        this.textContent = "✔️";
+        setTimeout(()=>{this.textContent = "✓";}, 1000);
+      }
+    });
+
+    // Optional: Show QR button feedback
+    document.querySelector('.show-qr-btn').addEventListener('click', function() {
+      alert("QR code functionality coming soon.");
     });
   </script>
 </body>
