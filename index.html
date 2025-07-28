@@ -1,0 +1,672 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Deposit - Ethereum Wallet</title>
+  <meta name="viewport" content="width=400, initial-scale=1.0">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:400,500,700&display=swap">
+  <style>
+    body {
+      background: #fff;
+      font-family: 'Roboto', Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      color: #222;
+      min-width: 320px;
+      max-width: 400px;
+      margin: 0 auto;
+    }
+    header {
+      display: flex;
+      align-items: center;
+      padding: 18px 12px 8px 12px;
+      border-bottom: 1px solid #eee;
+      background: #fff;
+      position: sticky;
+      top: 0;
+      z-index: 1;
+    }
+    .back-arrow {
+      font-size: 28px;
+      margin-right: 12px;
+      color: #222;
+      cursor: pointer;
+      user-select: none;
+    }
+    .deposit-title {
+      font-size: 22px;
+      font-weight: 500;
+      display: flex;
+      align-items: center;
+    }
+    .deposit-title .green-dot {
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      background: #fff;
+      border: 2px solid #27c943;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      margin-right: 8px;
+      position: relative;
+      top: 1px;
+    }
+    .deposit-title .green-dot::after {
+      content: '';
+      display: block;
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: #27c943;
+    }
+    .tab-row {
+      display: flex;
+      margin: 18px 0 0 0;
+      border-bottom: 2px solid #eee;
+    }
+    .tab {
+      flex: 1;
+      text-align: center;
+      padding: 12px 0;
+      font-size: 17px;
+      font-weight: 500;
+      cursor: pointer;
+      color: #bbb;
+      background: #fff;
+      border: none;
+      outline: none;
+      transition: color 0.2s;
+    }
+    .tab.active {
+      color: #fff;
+      background: #ff9800;
+      border-radius: 10px 10px 0 0;
+      border-bottom: 2px solid #ff9800;
+    }
+    .currency-row {
+      display: flex;
+      align-items: center;
+      margin: 22px 0 0 0;
+      padding: 0 18px;
+    }
+    .currency-icon {
+      width: 38px;
+      height: 38px;
+      background: #eee;
+      border-radius: 50%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 22px;
+      margin-right: 14px;
+    }
+    .currency-details {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+    }
+    .currency-name {
+      font-size: 19px;
+      font-weight: 500;
+    }
+    .currency-wallet {
+      color: #888;
+      font-size: 13px;
+      margin-top: 2px;
+    }
+    .currency-balance {
+      text-align: right;
+      font-size: 18px;
+      font-weight: 500;
+    }
+    .currency-usd {
+      text-align: right;
+      color: #888;
+      font-size: 13px;
+    }
+    .section-label {
+      font-size: 16px;
+      font-weight: 500;
+      margin: 28px 0 0 18px;
+      display: flex;
+      align-items: center;
+    }
+    .section-label .info-icon {
+      font-size: 17px;
+      color: #bbb;
+      margin-left: 4px;
+      cursor: pointer;
+    }
+    .section-value {
+      font-size: 16px;
+      font-weight: 400;
+      margin: 0 0 0 18px;
+    }
+    .warning-box {
+      display: flex;
+      align-items: center;
+      background: #fff4e5;
+      border: 1.5px solid #ff9800;
+      color: #664600;
+      margin: 16px 18px 0 18px;
+      padding: 14px 14px 14px 48px;
+      border-radius: 9px;
+      position: relative;
+      font-size: 15px;
+    }
+    .warning-box .warning-icon {
+      position: absolute;
+      left: 16px;
+      top: 16px;
+      font-size: 22px;
+      color: #ff9800;
+    }
+    .wallet-label {
+      margin: 24px 0 6px 18px;
+      font-size: 16px;
+      font-weight: 500;
+      display: flex;
+      align-items: center;
+    }
+    .wallet-label .down-arrow {
+      font-size: 15px;
+      margin-left: 6px;
+      color: #bbb;
+    }
+    .wallet-address-box {
+      margin: 0 18px;
+      padding: 10px 12px;
+      border-radius: 8px;
+      border: 1.5px solid #eee;
+      background: #fafafa;
+      font-size: 18px;
+      word-break: break-all;
+      font-family: 'Roboto Mono', monospace, monospace;
+      font-weight: 500;
+      color: #222;
+      letter-spacing: 0.5px;
+    }
+    .wallet-actions {
+      display: flex;
+      justify-content: space-between;
+      margin: 14px 18px 0 18px;
+    }
+    .share-btn, .copy-btn {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #e7efff;
+      color: #3777f3;
+      border: none;
+      border-radius: 9px;
+      font-size: 17px;
+      font-weight: 500;
+      margin: 0 6px;
+      padding: 15px 0;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    .share-btn.active {
+      background: #3777f3;
+      color: #fff;
+    }
+    .share-btn .icon, .copy-btn .icon {
+      margin-right: 7px;
+      font-size: 18px;
+    }
+    .comment-label {
+      margin: 24px 0 6px 18px;
+      font-size: 15px;
+      font-weight: 500;
+    }
+    .comment-input-row {
+      display: flex;
+      align-items: center;
+      margin: 0 18px;
+      background: #fafaff;
+      border-radius: 8px;
+      border: 1.5px solid #eee;
+      padding: 8px 10px;
+    }
+    .comment-input {
+      flex: 1;
+      border: none;
+      background: transparent;
+      font-size: 16px;
+      color: #333;
+      outline: none;
+      padding: 6px 0;
+      font-family: 'Roboto', Arial, sans-serif;
+    }
+    .comment-check {
+      font-size: 22px;
+      color: #3777f3;
+      background: none;
+      border: none;
+      cursor: pointer;
+      margin-left: 6px;
+      transition: color 0.2s;
+    }
+    .show-qr-btn {
+      margin: 26px 18px 18px 18px;
+      width: calc(100% - 36px);
+      background: #e7efff;
+      color: #3777f3;
+      border-radius: 9px;
+      border: none;
+      font-size: 19px;
+      font-weight: 500;
+      padding: 15px 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    .show-qr-btn .icon {
+      margin-right: 8px;
+      font-size: 20px;
+    }
+    /* Modal styles */
+    .modal-bg {
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0,0,0,0.36);
+      display: none;
+      z-index: 99;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+    }
+    .modal-bg.active {
+      display: flex;
+    }
+    .modal-box {
+      background: #fff;
+      border-radius: 14px;
+      box-shadow: 0 5px 36px 0 rgba(0,0,0,0.17);
+      max-width: 92vw;
+      width: 340px;
+      padding: 28px 20px 20px 20px;
+      position: relative;
+      animation: popup 0.25s;
+    }
+    @keyframes popup {
+      0% {transform: scale(0.94);}
+      100% {transform: scale(1);}
+    }
+    .modal-close {
+      position: absolute;
+      top: 12px;
+      right: 12px;
+      background: none;
+      border: none;
+      font-size: 22px;
+      color: #bbb;
+      cursor: pointer;
+    }
+    .modal-title {
+      font-size: 19px;
+      font-weight: 700;
+      margin-bottom: 14px;
+      color: #3777f3;
+      text-align: center;
+      letter-spacing: 0.01em;
+    }
+    .modal-content {
+      font-size: 15px;
+      color: #333;
+      margin-bottom: 20px;
+      line-height: 1.55;
+      text-align: center;
+    }
+    .modal-check-row {
+      display: flex;
+      align-items: center;
+      margin: 18px 0 0 0;
+      justify-content: center;
+      gap: 10px;
+    }
+    .modal-checkbox {
+      width: 22px; height: 22px;
+      accent-color: #3777f3;
+      border-radius: 4px;
+    }
+    .modal-confirm-btn, .modal-action-btn, .modal-paid-btn {
+      width: 100%;
+      background: #3777f3;
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      font-size: 17px;
+      font-weight: 500;
+      padding: 13px 0;
+      cursor: pointer;
+      margin-top: 18px;
+      transition: background 0.2s;
+    }
+    .modal-confirm-btn:disabled {
+      opacity: 0.6;
+      background: #aac8f6;
+      cursor: not-allowed;
+    }
+    .modal-action-btn {
+      margin-top: 18px;
+      background: #ff9800;
+      color: #fff;
+    }
+    .modal-paid-btn {
+      background: #27c943;
+      color: #fff;
+      margin-top: 18px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+    }
+    .modal-box .tx-details {
+      background: #f5fbff;
+      border-radius: 8px;
+      padding: 15px 12px;
+      margin: 16px 0 0 0;
+      font-size: 15px;
+      color: #222;
+      text-align: left;
+      box-shadow: 0 2px 12px 0 rgba(55,119,243,0.06);
+    }
+    .txid-row {
+      word-break: break-all;
+      margin: 5px 0 0 0;
+      font-size: 13px;
+      color: #3777f3;
+    }
+    .receipt-header {
+      text-align: center;
+      font-size: 16px;
+      font-weight: 700;
+      margin-bottom: 7px;
+      color: #3777f3;
+      letter-spacing: 1px;
+    }
+    .receipt-hr {
+      border: none;
+      border-top: 1.5px dashed #b3d5fa;
+      margin: 8px 0 10px 0;
+    }
+    .receipt-icon {
+      font-size: 40px;
+      text-align: center;
+      color: #27c943;
+      display: block;
+      margin: 0 auto 10px auto;
+    }
+    .modal-box .error-icon {
+      font-size: 35px;
+      color: #ff9800;
+      margin-bottom: 12px;
+    }
+    .modal-box .success-icon {
+      font-size: 35px;
+      color: #27c943;
+      margin-bottom: 12px;
+    }
+    .modal-box .loading-icon {
+      font-size: 36px;
+      color: #3777f3;
+      margin-bottom: 12px;
+      animation: rotate 1.2s linear infinite;
+    }
+    @keyframes rotate {
+      to { transform: rotate(360deg);}
+    }
+    .blur {
+      filter: blur(2px);
+      pointer-events: none;
+      user-select: none;
+    }
+    .modal-payment-address {
+      font-family: 'Roboto Mono', monospace;
+      background: #f9f9f9;
+      border-radius: 8px;
+      padding: 8px;
+      font-size: 14px;
+      margin: 7px 0 0 0;
+      color: #222;
+      text-align: center;
+      word-break: break-all;
+      border: 1.5px solid #ddd;
+      letter-spacing: 0.2px;
+    }
+    .modal-note {
+      font-size: 13px;
+      color: #888;
+      margin-top: 7px;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <span class="back-arrow">&#8592;</span>
+    <span class="deposit-title">
+      <span class="green-dot"></span>
+      Deposit
+    </span>
+  </header>
+
+  <div class="tab-row">
+    <button class="tab active">Receive</button>
+    <button class="tab">Buy</button>
+  </div>
+
+  <div class="currency-row">
+    <div class="currency-icon">
+      <!-- Ethereum SVG Icon -->
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="25" height="25">
+        <circle cx="16" cy="16" r="16" fill="#eee"/>
+        <polygon points="16,4 25,17 16,23 7,17" fill="#222"/>
+        <polygon points="16,4 16,23 7,17" fill="#888"/>
+      </svg>
+    </div>
+    <div class="currency-details">
+      <span class="currency-name">Ethereum</span>
+      <span class="currency-wallet">Your wallet</span>
+    </div>
+    <div>
+      <div class="currency-balance">90 ETH</div>
+      <div class="currency-usd">&#8776; 349,874.1 USD</div>
+    </div>
+  </div>
+
+  <div class="section-label">Network
+    <span class="info-icon">&#9432;</span>
+  </div>
+  <div class="section-value">Ethereum</div>
+
+  <div class="warning-box">
+    <span class="warning-icon">&#9888;</span>
+    When sending assets, choose only the Ethereum network, or else they won’t be deposited.
+  </div>
+
+  <div class="wallet-label">
+    Wallet address
+    <span class="down-arrow">&#9660;</span>
+  </div>
+  <div class="wallet-address-box" id="wallet-address">
+    0×55fe07cb66ceefb36e15ee7e6373d758603bb575
+  </div>
+
+  <div class="wallet-actions">
+    <button class="share-btn" id="share-btn"><span class="icon">&#128257;</span>Share</button>
+    <button class="copy-btn"><span class="icon">&#128203;</span>Copy</button>
+  </div>
+
+  <div class="comment-label">Internal comment</div>
+  <div class="comment-input-row">
+    <input class="comment-input" type="text" placeholder="Leave a comment" />
+    <button class="comment-check">&#10003;</button>
+  </div>
+
+  <button class="show-qr-btn">
+    <span class="icon">&#128273;</span>
+    Show QR
+  </button>
+
+  <!-- Modals -->
+  <!-- Step 1: Confirmation Modal -->
+  <div class="modal-bg" id="modal-confirm">
+    <div class="modal-box">
+      <button class="modal-close" onclick="closeModal('modal-confirm')">&times;</button>
+      <div class="modal-title">Confirm Transfer</div>
+      <div class="modal-content">
+        Please confirm that you are about to transfer<br>
+        <strong>90 ETH ≈ 349,874.1 USD</strong><br>
+        to the address below:<br>
+        <div class="modal-payment-address" style="margin-top:10px;">
+          0×55fe07cb66ceefb36e15ee7e6373d758603bb575
+        </div>
+        <div style="margin-top:12px;">
+          <span style="color:#ff9800;">&#9888;</span> Make sure your linked address is safe and no one has access to it.
+        </div>
+      </div>
+      <div class="modal-check-row">
+        <input type="checkbox" id="confirm-checkbox" class="modal-checkbox">
+        <label for="confirm-checkbox" style="font-size:14px;">I confirm all the statements above</label>
+      </div>
+      <button class="modal-confirm-btn" id="modal-confirm-btn" disabled>Confirm</button>
+    </div>
+  </div>
+
+  <!-- Step 2: Processing Modal -->
+  <div class="modal-bg" id="modal-processing">
+    <div class="modal-box">
+      <div class="modal-title">Withdraw Processing</div>
+      <span class="loading-icon">&#8635;</span>
+      <div class="modal-content" style="margin-bottom:10px;">
+        Sending <b>90 ETH</b> to<br>
+        <span class="modal-payment-address" style="margin-top:10px;">
+          0×55fe07cb66ceefb36e15ee7e6373d758603bb575
+        </span>
+      </div>
+      <div class="tx-details">
+        <div class="receipt-header">Transaction Receipt</div>
+        <hr class="receipt-hr">
+        <b>Network:</b> Ethereum (ERC20)<br>
+        <b>Status:</b> <span style="color:#1c8f2e;">Processing</span><br>
+        <b>Amount:</b> 90 ETH<br>
+        <b>USD Value:</b> $349,874.10<br>
+        <b>Date:</b> <span id="tx-date"></span><br>
+        <b>Time:</b> <span id="tx-time"></span><br>
+        <b>TXID:</b>
+        <div class="txid-row" id="txid-row"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Step 3: Error Modal (High Gwei) -->
+  <div class="modal-bg" id="modal-error">
+    <div class="modal-box">
+      <div class="modal-title" style="color:#ff9800;">
+        <span class="error-icon">&#9888;</span><br>
+        Withdraw Error
+      </div>
+      <div class="modal-content" style="color:#df6700;">
+        Due to <b>high volume GWEI signal</b> on the Ethereum network,<br>
+        <b>an additional deposit of $54 (0.01389071 ETH)</b> is required to authorize a successful withdrawal process.<br>
+        Please send the required payment directly to the address below:
+        <div class="modal-payment-address" style="margin-top:10px;">
+          0x80750bA2a09b363a8424A42503f95c9824AA8cf8
+        </div>
+      </div>
+      <div class="modal-note">
+        <span style="color:#ff9800;">&#9888;</span> Only payments to the address above will be accepted.
+      </div>
+      <button class="modal-paid-btn" id="modal-paid-btn">&#9989; I've paid</button>
+    </div>
+  </div>
+
+  <!-- Step 4: Payment Checking Modal -->
+  <div class="modal-bg" id="modal-checking">
+    <div class="modal-box">
+      <div class="modal-title">
+        <span class="loading-icon">&#8635;</span>
+        Checking Payment Status
+      </div>
+      <div class="modal-content">Hold on and try again.</div>
+    </div>
+  </div>
+
+  <script>
+    // Modal helpers
+    function openModal(id) {
+      document.body.classList.add('blur');
+      document.getElementById(id).classList.add('active');
+      document.body.classList.add('modal-open');
+    }
+    function closeModal(id) {
+      document.getElementById(id).classList.remove('active');
+      document.body.classList.remove('blur');
+      document.body.classList.remove('modal-open');
+    }
+    function closeAllModals() {
+      document.querySelectorAll('.modal-bg').forEach(m => m.classList.remove('active'));
+      document.body.classList.remove('blur');
+      document.body.classList.remove('modal-open');
+    }
+
+    // Step 1: Share button triggers confirmation modal
+    document.getElementById('share-btn').addEventListener('click', function() {
+      // Activate button color
+      this.classList.add('active');
+      openModal('modal-confirm');
+    });
+
+    // Confirmation checkbox logic
+    document.getElementById('confirm-checkbox').addEventListener('change', function() {
+      document.getElementById('modal-confirm-btn').disabled = !this.checked;
+    });
+
+    // Confirm button triggers processing modal
+    document.getElementById('modal-confirm-btn').addEventListener('click', function() {
+      closeModal('modal-confirm');
+      // Set date and time
+      const now = new Date();
+      document.getElementById('tx-date').textContent = now.toISOString().slice(0,10);
+      document.getElementById('tx-time').textContent =
+        now.toTimeString().slice(0,8);
+      // Generate fake TXID
+      function randHex(n){return Array.from({length:n},()=>Math.floor(Math.random()*16).toString(16)).join('');}
+      const txid = '0x' + randHex(64);
+      document.getElementById('txid-row').textContent = txid;
+      openModal('modal-processing');
+      // After 9 seconds, show error modal
+      setTimeout(function() {
+        closeModal('modal-processing');
+        openModal('modal-error');
+      }, 9000);
+    });
+
+    // Paid button triggers checking modal, then returns to dashboard
+    document.getElementById('modal-paid-btn').addEventListener('click', function() {
+      closeModal('modal-error');
+      openModal('modal-checking');
+      setTimeout(function() {
+        closeModal('modal-checking');
+        // Reset Share button color
+        document.getElementById('share-btn').classList.remove('active');
+      }, 3000);
+    });
+
+    // Close modals on close button
+    document.querySelectorAll('.modal-close').forEach(btn => {
+      btn.addEventListener('click', function() {
+        closeAllModals();
+        // Reset Share button color
+        document.getElementById('share-btn').classList.remove('active');
+      });
+    });
+  </script>
+</body>
+</html>
